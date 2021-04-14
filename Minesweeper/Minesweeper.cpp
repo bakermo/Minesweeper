@@ -1,20 +1,62 @@
-// Minesweeper.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
+#include <SFML/Graphics.hpp>
 #include <iostream>
+using namespace std;
+using namespace sf;
+
+void setBoard(sf::RenderWindow& window);
 
 int main()
 {
-    std::cout << "Hello World!\n";
+    sf::RenderWindow window(sf::VideoMode(800, 600), "Test board");// DO NOT DO THIS
+    while (window.isOpen())
+    {
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+                window.close();
+
+            if (event.type == sf::Event::MouseButtonPressed)
+            {
+                if (event.mouseButton.button == sf::Mouse::Right)
+                {
+                    cout << "right click" << endl;
+                }
+                // we don't want a simple "else" because there 
+                // may be more than 2 mouse buttons that we don't 
+                // want to "left click" on
+                if (event.mouseButton.button == sf::Mouse::Left)
+                {
+                    cout << "left click" << endl;
+                }
+            }
+        }
+
+        window.clear();
+        setBoard(window);
+        window.display();
+    }
+    return 0;
 }
 
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
+//TODO: this is just an example, reimplement this
+void setBoard(sf::RenderWindow& window)
+{
+    Texture backgroundTile;
+    backgroundTile.loadFromFile("images/tile_revealed.png");
+    Sprite backgroundTileSprite(backgroundTile);
+    Texture coverTile;
+    coverTile.loadFromFile("images/tile_hidden.png");
+    Sprite coverTileSprite(coverTile);
 
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
+    for (int i = 0; i < 16; i++)
+    {
+        for (int j = 0; j < 25; j++)
+        {
+            backgroundTileSprite.setPosition(j * 32, i * 32);
+            window.draw(backgroundTileSprite);
+            coverTileSprite.setPosition(j * 32, i * 32);
+            window.draw(coverTileSprite);
+        }
+    }
+}
