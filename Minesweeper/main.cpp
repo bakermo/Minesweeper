@@ -1,22 +1,44 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include "TextureManager.h"
 #include "Random.h";
+#include "Board.h" // remove some of these that arent getting used
+                    // todo: include leaker?
 
 using namespace std;
 using namespace sf;
 
-void setBoard(sf::RenderWindow& window);
+Board LoadBoardFromConfig()
+{
+    ifstream file("boards/config.cfg");
+    int config[3] = {0, 0, 0};
+    if (file.is_open())
+    {
+        string line;
+        for (int i = 0; i < 3; i++)
+        {
+            getline(file, line);
+            istringstream lineStream(line);
+            config[i] = stoi(line);
+        }
+    }
+
+    Board board(config[0], config[1], config[2]);
+    return board;
+}
 
 int main()
 {
     TextureManager::SetImagesDirectory("images/");
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Test board");// DO NOT DO THIS
-    int randomX = Random::Int(0, window.getSize().x);
-    int randomY = Random::Int(0, window.getSize().y);
+    Board board = LoadBoardFromConfig();
+    sf::RenderWindow window(sf::VideoMode(board.GetWidth(), board.GetHeight()), "Minesweeper", sf::Style::Titlebar | sf::Style::Close);
+    //int randomX = Random::Int(0, window.getSize().x);
+    //int randomY = Random::Int(0, window.getSize().y);
 
-    cout << "random x" << randomX << endl;
-    cout << "random y" << randomY << endl;
+    //cout << "random x" << randomX << endl;
+    //cout << "random y" << randomY << endl;
 
     while (window.isOpen())
     {
@@ -42,30 +64,13 @@ int main()
             }
         }
 
-        window.clear();
-        setBoard(window);
+        window.clear(sf::Color::White);
+        // let the board handle the rendering
+        board.Render(window);
         window.display();
     }
 
     // Clear out any textures before the program ends
     TextureManager::Clear();
     return 0;
-}
-
-//TODO: this is just an example, reimplement this
-void setBoard(sf::RenderWindow& window)
-{
-    Sprite backgroundTileSprite(TextureManager::GetTexture("tile_revealed"));
-    Sprite coverTileSprite(TextureManager::GetTexture("tile_hidden"));
-
-    for (int i = 0; i < 16; i++)
-    {
-        for (int j = 0; j < 25; j++)
-        {
-            backgroundTileSprite.setPosition(j * 32, i * 32);
-            window.draw(backgroundTileSprite);
-            coverTileSprite.setPosition(j * 32, i * 32);
-            window.draw(coverTileSprite);
-        }
-    }
 }
