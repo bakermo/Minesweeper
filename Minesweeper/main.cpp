@@ -3,7 +3,6 @@
 #include <fstream>
 #include <sstream>
 #include "TextureManager.h"
-#include "Random.h";
 #include "Board.h" // remove some of these that arent getting used
                     // todo: include leaker?
 
@@ -34,12 +33,6 @@ int main()
     TextureManager::SetImagesDirectory("images/");
     Board board = LoadBoardFromConfig();
     sf::RenderWindow window(sf::VideoMode(board.GetWidth(), board.GetHeight()), "Minesweeper", sf::Style::Titlebar | sf::Style::Close);
-    //int randomX = Random::Int(0, window.getSize().x);
-    //int randomY = Random::Int(0, window.getSize().y);
-
-    //cout << "random x" << randomX << endl;
-    //cout << "random y" << randomY << endl;
-
     while (window.isOpen())
     {
         sf::Event event;

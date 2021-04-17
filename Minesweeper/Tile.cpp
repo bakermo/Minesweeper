@@ -1,9 +1,9 @@
 #include "Tile.h"
-Tile::Tile(int column, int row, bool mine)
+Tile::Tile(int column, int row)
 {
 	this->column = column;
 	this->row = row;
-	hasMine = mine;
+	hasMine = false;
 	isFlagged = false;
 	isRevealed = false;
 }
@@ -28,9 +28,16 @@ int Tile::YLowerBound()
 	return YUpperBound() + tileWidth;
 }
 
+
 bool Tile::HasMine()
 {
 	return hasMine;
+}
+
+
+void Tile::PlaceMine()
+{
+	hasMine = true;
 }
 
 bool Tile::IsRevealed()
@@ -54,6 +61,11 @@ void Tile::ToggleFlag()
 	isFlagged = !isFlagged;
 }
 
+void Tile::ToggleCheat()
+{
+	cheat = !cheat;
+}
+
 void Tile::Render(sf::RenderWindow& window)
 {
 	if (isRevealed)
@@ -72,6 +84,11 @@ void Tile::Render(sf::RenderWindow& window)
 		{
 			DrawLayer(window, "flag");
 		}
+	}
+
+	if (cheat && hasMine)
+	{
+		DrawLayer(window, "mine");
 	}
 }
 
