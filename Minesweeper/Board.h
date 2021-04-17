@@ -31,14 +31,16 @@ class Board
 	MenuButton debugButtons[3];
 	map<pair<int, int>, Tile> tiles;
 
-	pair<int, int> GetTileKey(int xPos, int yPos);
+	void NewGame();
 	BoardConfig LoadFromConfig();
 	void LoadTestScenario(string board);
 	void CreateMenu();
-	void NewGame();
-	void InitializeMines();
+	void RandomizeMines();
+	pair<int, int> GetAdjacentTileKey(int column, int row, int adjacentIndex);
+	void MapAdjacentTiles();
 	void Win();
 	void Lose();
+	pair<int, int> GetTileKey(int xPos, int yPos);
 public:
 	Board();
 	//todo: review which of these need to actually be public or not

@@ -1,32 +1,37 @@
 #pragma once
 #include <string>
 #include <SFML/Graphics.hpp>
+#include <vector>
 #include "TextureManager.h"
 
 class Tile
 {
 	int column;
 	int row;
+	int adjacentMines;
 	bool hasMine;
 	bool isRevealed;
 	bool isFlagged;
-	bool cheat = false;
+	bool isLosingTile;
+	bool showMine;
 	const int tileWidth = 32;
-	void DrawLayer(sf::RenderWindow& window, string texture);
+	std::vector<Tile*> adjacentTiles;
+	void DrawLayer(sf::RenderWindow& window, string texture, bool losingTile = false);
 public:
 	Tile(int column, int row);
 	int XLeftBound();
 	int XRightBound();
 	int YUpperBound();
 	int YLowerBound();
-
-	void PlaceMine();
+	bool HasMine();
 	bool IsRevealed();
 	bool IsFlagged();
-	bool HasMine();
 
+	void SetAdjacentTiles(std::vector<Tile*> adjacentTiles);
+	void PlaceMine();
 	void Reveal();
 	void ToggleFlag();
+	void ShowMine();
 	void ToggleCheat();
 	void Render(sf::RenderWindow& window);
 };
