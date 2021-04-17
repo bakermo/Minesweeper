@@ -10,11 +10,14 @@ class Tile
 	bool hasMine;
 	bool isRevealed;
 	bool isFlagged;
+	const int tileWidth = 32;
 	void DrawLayer(sf::RenderWindow& window, string texture);
 public:
 	Tile(int column, int row, bool hasMine);
-	int XPos();
-	int YPos();
+	int XLeftBound();
+	int XRightBound();
+	int YUpperBound();
+	int YLowerBound();
 
 	bool IsRevealed();
 	bool IsFlagged();

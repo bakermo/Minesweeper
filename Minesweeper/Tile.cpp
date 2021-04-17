@@ -8,14 +8,24 @@ Tile::Tile(int column, int row, bool mine)
 	isRevealed = false;
 }
 
-int Tile::XPos()
+int Tile::XLeftBound()
 {
-	return column * 32;
+	return column * tileWidth;
 }
 
-int Tile::YPos()
+int Tile::XRightBound()
 {
-	return row * 32;
+	return XLeftBound() + tileWidth;
+}
+
+int Tile::YUpperBound()
+{
+	return row * tileWidth;
+}
+
+int Tile::YLowerBound()
+{
+	return YUpperBound() + tileWidth;
 }
 
 bool Tile::HasMine()
@@ -37,8 +47,6 @@ void Tile::Reveal()
 {
 	if (!isRevealed)
 		isRevealed = true;
-
-	// then take some action
 }
 
 void Tile::ToggleFlag()
@@ -62,7 +70,7 @@ void Tile::Render(sf::RenderWindow& window)
 		DrawLayer(window, "tile_hidden");
 		if (isFlagged)
 		{
-			DrawLayer(window, "flagged");
+			DrawLayer(window, "flag");
 		}
 	}
 }
@@ -70,6 +78,6 @@ void Tile::Render(sf::RenderWindow& window)
 void Tile::DrawLayer(sf::RenderWindow& window, string texture)
 {
 	sf::Sprite sprite(TextureManager::GetTexture(texture));
-	sprite.setPosition(XPos(), YPos());
+	sprite.setPosition(XLeftBound(), YUpperBound());
 	window.draw(sprite);
 }

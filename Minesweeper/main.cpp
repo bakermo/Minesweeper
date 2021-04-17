@@ -50,17 +50,11 @@ int main()
 
             if (event.type == sf::Event::MouseButtonPressed)
             {
-                if (event.mouseButton.button == sf::Mouse::Right)
-                {
-                    cout << "right click" << endl;
-                }
-                // we don't want a simple "else" because there 
-                // may be more than 2 mouse buttons that we don't 
-                // want to "left click" on
-                if (event.mouseButton.button == sf::Mouse::Left)
-                {
-                    cout << "left click" << endl;
-                }
+                auto position = sf::Mouse::getPosition(window);
+                board.OnClick(event.mouseButton);
+
+                cout << "Row: " << position.y / 32 << " Column:" << position.x / 32 << endl;
+                cout << "click: xPos: " << position.x << " yPos: " << position.y << endl; 
             }
         }
 

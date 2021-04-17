@@ -10,7 +10,11 @@ class Board
 	int columns;
 	int rows;
 	int mines;
-	vector<Tile> tiles;
+	const int tileSize = 32;
+	const int menuDepth = 88;
+	int menuYPosition;
+	map<pair<int, int>, Tile> tiles;
+	pair<int, int> GetTileKey(int xPos, int yPos);
 
 public:
 	Board(int columns, int rows, int mines);
@@ -21,6 +25,7 @@ public:
 	int GetMineCount();
 	int GetHeight();
 	int GetWidth();
+	void OnClick(sf::Event::MouseButtonEvent mouseButtonEvent);
 	void Render(sf::RenderWindow& window);
 };
 
