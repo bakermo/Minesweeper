@@ -52,7 +52,7 @@ bool Tile::IsFlagged()
 
 void Tile::Reveal()
 {
-	if (!isRevealed)
+	if (!isFlagged && !isRevealed)
 		isRevealed = true;
 }
 
