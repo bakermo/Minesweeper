@@ -358,7 +358,6 @@ void Board::Render(sf::RenderWindow& window)
 	}
 
 	int count = GetMinesRemaining();
-	cout << "Mines remaining: " << count << endl;
 	sf::Texture digits = TextureManager::GetTexture("digits");
 
 	// Show blank or negative depending on count
