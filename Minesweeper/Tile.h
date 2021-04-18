@@ -29,7 +29,7 @@ public:
 
 	void SetAdjacentTiles(std::vector<Tile*> adjacentTiles);
 	void PlaceMine();
-	void Reveal();
+	int Reveal();
 	void ToggleFlag();
 	void ShowMine();
 	void ToggleCheat();

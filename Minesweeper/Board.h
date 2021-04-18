@@ -13,14 +13,16 @@ struct BoardConfig
 {
 	int columns;
 	int rows;
-	int mines;
+	int mineCount;
 };
 
 class Board
 {
 	int columns;
 	int rows;
-	int mines;
+	int mineCount;
+	int tilesRevealed;
+	int flagCount;
 	bool gameOver;
 	const int tileSize = 32;
 	const int menuDepth = 88;
@@ -38,7 +40,7 @@ class Board
 	void RandomizeMines();
 	pair<int, int> GetAdjacentTileKey(int column, int row, int adjacentIndex);
 	void MapAdjacentTiles();
-	void Win();
+	void CheckWin();
 	void Lose();
 	pair<int, int> GetTileKey(int xPos, int yPos);
 public:

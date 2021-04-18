@@ -10,7 +10,8 @@ void Board::NewGame()
 	BoardConfig config = LoadFromConfig();
 	this->columns = config.columns;
 	this->rows = config.rows;
-	this->mines = config.mines;
+	this->mineCount = config.mineCount;
+	this->tilesRevealed = 0;
 
 	gameOver = false;
 	tiles.clear();
@@ -47,7 +48,7 @@ BoardConfig Board::LoadFromConfig()
 	BoardConfig boardConfig;
 	boardConfig.columns = config[0];
 	boardConfig.rows = config[1];
-	boardConfig.mines = config[2];
+	boardConfig.mineCount = config[2];
 	return boardConfig;
 }
 
@@ -61,7 +62,7 @@ void Board::LoadTestScenario(string board)
 	{
 		int currentColumn = 0;
 		int currentRow = 0;
-		int mineCount = 0;
+		int minesPlaced = 0;
 		string line;
 		while (getline(file, line))
 		{
@@ -72,7 +73,7 @@ void Board::LoadTestScenario(string board)
 				if (c != '0')
 				{
 					tile.PlaceMine();
-					mineCount++;
+					minesPlaced++;
 				}
 				tiles.emplace(make_pair(currentColumn, currentRow), tile);
 				currentColumn++;
@@ -82,7 +83,8 @@ void Board::LoadTestScenario(string board)
 		}
 		this->columns = line.length();
 		this->rows = currentRow++;
-		this->mines = mineCount;
+		this->mineCount = minesPlaced;
+		this->tilesRevealed = 0;
 		menuYPosition = rows * tileSize;	
 	}
 
@@ -109,7 +111,7 @@ void Board::CreateMenu()
 void Board::RandomizeMines()
 {
 	int minesPlaced = 0;
-	while (minesPlaced < mines)
+	while (minesPlaced < mineCount)
 	{
 		// rows and columns are 0 based
 		int randomX = Random::Int(0, columns - 1);
@@ -179,7 +181,7 @@ void Board::MapAdjacentTiles()
 {
 	// There is most certainly a way more obvious way to do this
 	// with some kind of tree structure or maybe even using stacks,
-	// but I've already started down this map road  and have time 
+	// but I've already started down this map road and have time 
 	// constraints, so here we go...
 	// I'll visit this some day for a total refactor.
 	map<pair<int, int>, Tile>::iterator it;
@@ -198,7 +200,7 @@ void Board::MapAdjacentTiles()
 			auto adj = tiles.find(key);
 			if (adj != tiles.end())
 			{
-				// this adjactent tile exists
+				// this adjacent tile exists
 				Tile* adjTile = &tiles.at(key);
 				adjacentTiles.push_back(adjTile);
 			}
@@ -208,10 +210,21 @@ void Board::MapAdjacentTiles()
 	}
 }
 
-void Board::Win()
+void Board::CheckWin()
 {
-	gameOver = true;
-	gameBtn.SetTexture("face_lose");
+	if (tilesRevealed >= (tiles.size() - mineCount))
+	{
+		gameOver = true;
+		gameBtn.SetTexture("face_win");
+
+		// Flag all the mines
+		map<pair<int, int>, Tile>::iterator it;
+		for (it = tiles.begin(); it != tiles.end(); it++)
+		{
+			if (it->second.HasMine() && !it->second.IsFlagged())
+				it->second.ToggleFlag();
+		}
+	}
 }
 
 void Board::Lose()
@@ -219,6 +232,7 @@ void Board::Lose()
 	gameOver = true;
 	gameBtn.SetTexture("face_lose");
 
+	// Reveal all the mines
 	map<pair<int, int>, Tile>::iterator it;
 	for (it = tiles.begin(); it != tiles.end(); it++)
 	{
@@ -252,17 +266,17 @@ int Board::GetRows()
 
 int Board::GetMineCount()
 {
-	return mines;
+	return mineCount;
 }
 
 int Board::GetHeight()
 {
-	return (rows * 32) + menuDepth;
+	return (rows * tileSize) + menuDepth;
 }
 
 int Board::GetWidth()
 {
-	return columns * 32;
+	return columns * tileSize;
 }
 
 void Board::OnClick(sf::Event::MouseButtonEvent mouseButtonEvent)
@@ -275,6 +289,10 @@ void Board::OnClick(sf::Event::MouseButtonEvent mouseButtonEvent)
 		if (mouseButtonEvent.button == sf::Mouse::Right)
 		{
 			tiles.at(tileKey).ToggleFlag();
+			if (tiles.at(tileKey).IsFlagged())
+				flagCount++;
+			else
+				flagCount--;
 		}
 		else if (mouseButtonEvent.button == sf::Mouse::Left)
 		{
@@ -283,12 +301,15 @@ void Board::OnClick(sf::Event::MouseButtonEvent mouseButtonEvent)
 			Tile* tile = &tiles.at(tileKey);
 			if (!tile->IsFlagged() && !tile->IsRevealed())
 			{
-				tile->Reveal();
+				tilesRevealed += tile->Reveal();
 				if (tile->HasMine())
 				{
 					Lose();
 				}
-				//todo: recursive reveal, game win/fail
+				else
+				{
+					CheckWin();
+				}
 			}
 		}
 	}

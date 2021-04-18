@@ -59,7 +59,7 @@ bool Tile::IsFlagged()
 
 void Tile::SetAdjacentTiles(std::vector<Tile*> adjacentTiles) 
 {
-	//ok, theres probably a better way to do this
+	// ok, theres probably a better way to do this
 	// but its an order of ops problem
 	// you need the tiles to exist before you know what is adjacent to them
 	this->adjacentMines = 0;
@@ -78,17 +78,38 @@ void Tile::PlaceMine()
 	hasMine = true;
 }
 
-
-void Tile::Reveal()
+/// <summary>
+/// Reveals a tile
+/// </summary>
+/// <returns>The number of tiles recursively revealed</returns>
+int Tile::Reveal()
 {
+	int revealed = 0;
 	if (!isFlagged && !isRevealed)
 	{
 		isRevealed = true;
+		revealed++;
 		if (hasMine)
 		{
 			isLosingTile = true;
 		}
+		else
+		{
+			if (adjacentMines == 0)
+			{
+				// Execute order 66
+				for (Tile* t : adjacentTiles)
+				{
+					if (!t->IsRevealed() && !t->HasMine() && !t->IsFlagged())
+					{
+						revealed +=	t->Reveal();
+					}
+				}
+			}
+		}
 	}
+
+	return revealed;
 }
 
 void Tile::ToggleFlag()
@@ -123,7 +144,6 @@ void Tile::Render(sf::RenderWindow& window)
 		{
 			DrawLayer(window, "number_" + std::to_string(adjacentMines));
 		}
-		//TODO: recursive reveal!
 	}
 	else
 	{

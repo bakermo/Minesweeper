@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include "TextureManager.h"
-#include "Board.h" // remove some of these that arent getting used
-                    // todo: include leaker?
+#include "Board.h" 
+
 using namespace std;
 using namespace sf;
 
@@ -33,8 +33,8 @@ int main()
                 auto position = sf::Mouse::getPosition(window);
                 board.OnClick(event.mouseButton);
 
-                cout << "Row: " << position.y / 32 << " Column:" << position.x / 32 << endl;
-                cout << "click: xPos: " << position.x << " yPos: " << position.y << endl; 
+                //cout << "Row: " << position.y / 32 << " Column:" << position.x / 32 << endl;
+                //cout << "click: xPos: " << position.x << " yPos: " << position.y << endl; 
             }
         }
 
