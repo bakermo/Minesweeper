@@ -45,10 +45,10 @@ class Board
 	pair<int, int> GetTileKey(int xPos, int yPos);
 public:
 	Board();
-	//todo: review which of these need to actually be public or not
 	int GetColumns();
 	int GetRows();
 	int GetMineCount();
+	int GetMinesRemaining();
 	int GetHeight();
 	int GetWidth();
 	void OnClick(sf::Event::MouseButtonEvent mouseButtonEvent);

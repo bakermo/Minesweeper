@@ -12,8 +12,9 @@ void Board::NewGame()
 	this->rows = config.rows;
 	this->mineCount = config.mineCount;
 	this->tilesRevealed = 0;
+	this->flagCount = 0;
+	this->gameOver = false;
 
-	gameOver = false;
 	tiles.clear();
 	for (int row = 0; row < rows; row++)
 	{
@@ -24,7 +25,7 @@ void Board::NewGame()
 			tiles.emplace(make_pair(col, row), tile);
 		}
 	}
-	menuYPosition = rows * tileSize;
+	this->menuYPosition = rows * tileSize;
 	RandomizeMines();
 	MapAdjacentTiles();
 	CreateMenu();
@@ -54,7 +55,6 @@ BoardConfig Board::LoadFromConfig()
 
 void Board::LoadTestScenario(string board)
 {
-	gameOver = false;
 	tiles.clear();
 	string fileName = "boards/" + board + ".brd";
 	ifstream file(fileName);
@@ -85,7 +85,9 @@ void Board::LoadTestScenario(string board)
 		this->rows = currentRow++;
 		this->mineCount = minesPlaced;
 		this->tilesRevealed = 0;
-		menuYPosition = rows * tileSize;	
+		this->flagCount = 0;
+		this->gameOver = false;
+		this->menuYPosition = rows * tileSize;	
 	}
 
 	MapAdjacentTiles();
@@ -222,7 +224,10 @@ void Board::CheckWin()
 		for (it = tiles.begin(); it != tiles.end(); it++)
 		{
 			if (it->second.HasMine() && !it->second.IsFlagged())
+			{
 				it->second.ToggleFlag();
+				flagCount++;
+			}
 		}
 	}
 }
@@ -267,6 +272,11 @@ int Board::GetRows()
 int Board::GetMineCount()
 {
 	return mineCount;
+}
+
+int Board::GetMinesRemaining()
+{
+	return mineCount - flagCount;
 }
 
 int Board::GetHeight()
@@ -347,9 +357,47 @@ void Board::Render(sf::RenderWindow& window)
 		it->second.Render(window);
 	}
 
-	sf::Sprite counterSprite(TextureManager::GetTexture("digits"));
-	counterSprite.setPosition(0, menuYPosition);
-	window.draw(counterSprite);
+	int count = GetMinesRemaining();
+	cout << "Mines remaining: " << count << endl;
+	sf::Texture digits = TextureManager::GetTexture("digits");
+
+	// Show blank or negative depending on count
+	int digitWidth = 21;
+	int digitHeight = 32;
+
+	if (count < 0)
+	{
+		sf::Sprite negativeSprite(digits);
+		// negative symbol is 10th section of texture
+		negativeSprite.setTextureRect(sf::IntRect(10 * digitWidth, 0, digitWidth, digitHeight));
+		negativeSprite.setPosition(0, menuYPosition);
+		window.draw(negativeSprite);
+	}
+	
+	count = abs(count);
+	int hundredsDigit = count / 100;
+	int tens = count % 100;
+	int tensDigit = tens / 10;
+	int onesDigit = tens % 10;
+
+	sf::Sprite hundredsSprite(digits);
+	int digitsTexturePosition = hundredsDigit == 0 ? 0 : hundredsDigit * digitWidth;
+	hundredsSprite.setTextureRect(sf::IntRect(digitsTexturePosition, 0, digitWidth, digitHeight));
+	// allow space for negative if necessary
+	hundredsSprite.setPosition(digitWidth, menuYPosition);
+	window.draw(hundredsSprite);
+
+	sf::Sprite tensSprite(digits);
+	digitsTexturePosition = tensDigit == 0 ? 0 : tensDigit * digitWidth;
+	tensSprite.setTextureRect(sf::IntRect(digitsTexturePosition, 0, digitWidth, digitHeight));
+	tensSprite.setPosition(hundredsSprite.getPosition().x + digitWidth, menuYPosition);
+	window.draw(tensSprite);
+
+	sf::Sprite onesSprite(digits);
+	digitsTexturePosition = onesDigit == 0 ? 0 : onesDigit * digitWidth;
+	onesSprite.setTextureRect(sf::IntRect(digitsTexturePosition, 0, digitWidth, digitHeight));
+	onesSprite.setPosition(tensSprite.getPosition().x + digitWidth, menuYPosition);
+	window.draw(onesSprite);
 
 	gameBtn.Render(window);
 	debugMineBtn.Render(window);
